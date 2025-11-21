@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educational Roguelike - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pixel-style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <h1 class="page-title">🎮 EDUCATIONAL ROGUELIKE</h1>
+            <p class="page-subtitle">Learn Through Battle</p>
+        </div>
+
+        <!-- Upload New PDF Button -->
+        <div class="text-center mb-xl">
+            <a href="/upload" class="btn btn-primary">📤 Upload New PDF</a>
+        </div>
+
+        <!-- PDFs List -->
+        {% if pdfs %}
+        <h2 class="text-center text-primary mb-lg">📚 Your Study Materials</h2>
+
+        <div class="card-grid">
+            {% for pdf in pdfs %}
+            <div class="card">
+                <div class="card-title">{{ pdf.title }}</div>
+                <div class="card-content">
+                    <div class="character-stat">
+                        <span>📄 Pages:</span>
+                        <span class="text-accent">{{ pdf.num_pages }}</span>
+                    </div>
+                    <div class="character-stat">
+                        <span>❓ Questions:</span>
+                        <span class="text-primary">{{ pdf.question_count }}</span>
+                    </div>
+                    <div class="character-stat">
+                        <span>📅 Uploaded:</span>
+                        <span>{{ pdf.upload_date[:10] }}</span>
+                    </div>
+
+                    {% if pdf.ready_to_play %}
+                    <div class="btn-group mt-md">
+                        <a href="/game/{{ pdf.id }}" class="btn btn-primary">⚔️ Play</a>
+                        <a href="/stats/{{ pdf.id }}" class="btn btn-secondary">📊 Stats</a>
+                    </div>
+                    {% else %}
+                    <div class="mt-md">
+                        <p class="text-warning" style="font-size: 10px;">
+                            ⚠️ Need at least 10 questions to play
+                        </p>
+                        <button
+                            onclick="generateQuestions({{ pdf.id }})"
+                            class="btn btn-primary mt-sm"
+                            id="gen-btn-{{ pdf.id }}">
+                            🤖 Generate Questions
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="card text-center">
+            <div class="card-content">
+                <p class="text-accent mb-md" style="font-size: 14px;">
+                    📖 No PDFs uploaded yet
+                </p>
+                <p style="font-size: 10px; line-height: 2;">
+                    Upload a PDF to start your learning adventure!<br>
+                    Questions will be generated automatically using AI.
+                </p>
+                <a href="/upload" class="btn btn-primary mt-lg">📤 Upload Your First PDF</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div id="loading-indicator" class="hidden notification info">Loading...</div>
+
+    <script>
+        async function generateQuestions(pdfId) {
+            const btn = document.getElementById(`gen-btn-${pdfId}`);
+            btn.disabled = true;
+            btn.textContent = '⏳ Generating...';
+
+            try {
+                const response = await fetch(`/api/generate-questions/${pdfId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ num_questions: 30 })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to generate questions');
+                }
+
+                alert(`✅ Success! Generated ${data.questions_saved} questions.\nEstimated cost: $${data.cost_estimate.estimated_cost_usd.toFixed(4)}`);
+                location.reload();
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`❌ Error: ${error.message}`);
+                btn.disabled = false;
+                btn.textContent = '🤖 Generate Questions';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Games - {{ pdf.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pixel-style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <h1 class="page-title">💾 SAVED GAMES</h1>
+            <p class="page-subtitle">{{ pdf.title }}</p>
+        </div>
+
+        <div class="btn-group mb-xl">
+            <a href="/" class="btn">🏠 Home</a>
+            <a href="/game/{{ pdf.id }}" class="btn btn-primary">⚔️ New Game</a>
+        </div>
+
+        <!-- Saved Games List -->
+        {% if saves %}
+        <div class="card-grid">
+            {% for save in saves %}
+            <div class="card">
+                <div class="card-title">{{ save.save_name }}</div>
+                <div class="card-content">
+                    <div class="character-stat">
+                        <span>💚 HP:</span>
+                        <span class="text-primary">{{ save.player_hp }}/{{ save.player_max_hp }}</span>
+                    </div>
+                    <div class="character-stat">
+                        <span>⚔️ Encounter:</span>
+                        <span>{{ save.current_encounter }}/10</span>
+                    </div>
+                    <div class="character-stat">
+                        <span>💰 Score:</span>
+                        <span class="text-accent">{{ save.score }}</span>
+                    </div>
+                    <div class="character-stat">
+                        <span>📅 Last Played:</span>
+                        <span>{{ save.last_played[:10] }}</span>
+                    </div>
+
+                    <div class="btn-group mt-md">
+                        <button onclick="loadSave({{ save.id }})" class="btn btn-primary">
+                            ▶️ Load
+                        </button>
+                        <button onclick="deleteSave({{ save.id }})" class="btn btn-danger">
+                            🗑️ Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card text-center">
+            <div class="card-content">
+                <p class="text-accent mb-lg" style="font-size: 14px;">
+                    📭 No saved games yet
+                </p>
+                <p style="font-size: 10px; line-height: 2;">
+                    Start a new game and save your progress!
+                </p>
+                <a href="/game/{{ pdf.id }}" class="btn btn-primary mt-lg">
+                    ⚔️ Start New Game
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div id="loading-indicator" class="hidden notification info">Loading...</div>
+
+    <script>
+        async function loadSave(saveId) {
+            const loadingEl = document.getElementById('loading-indicator');
+            loadingEl.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`/api/game/load/${saveId}`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load save');
+                }
+
+                // Redirect to game
+                window.location.href = `/game/${data.pdf_id}`;
+
+            } catch (error) {
+                console.error('Load error:', error);
+                alert(`❌ Error: ${error.message}`);
+                loadingEl.classList.add('hidden');
+            }
+        }
+
+        function deleteSave(saveId) {
+            if (!confirm('Are you sure you want to delete this save?')) {
+                return;
+            }
+
+            // In a full implementation, add a delete endpoint
+            alert('Delete functionality requires additional API endpoint');
+        }
+    </script>
+</body>
+</html>

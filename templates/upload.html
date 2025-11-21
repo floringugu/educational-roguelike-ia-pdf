@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload PDF - Educational Roguelike</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pixel-style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <h1 class="page-title">📤 UPLOAD PDF</h1>
+            <p class="page-subtitle">Add Study Material</p>
+        </div>
+
+        <div class="btn-group mb-xl">
+            <a href="/" class="btn">← Back to Home</a>
+        </div>
+
+        <!-- Upload Form -->
+        <div class="card" style="max-width: 600px; margin: 0 auto;">
+            <div class="card-title">📄 Upload Study PDF</div>
+            <div class="card-content">
+                <form id="upload-form" enctype="multipart/form-data" style="text-align: center;">
+                    <div class="mb-lg">
+                        <input
+                            type="file"
+                            id="pdf-file"
+                            name="file"
+                            accept=".pdf"
+                            required
+                            style="display: none;">
+                        <label for="pdf-file" class="btn btn-primary" style="cursor: pointer;">
+                            📁 Choose PDF File
+                        </label>
+                        <div id="file-name" class="mt-md text-accent" style="font-size: 10px;"></div>
+                    </div>
+
+                    <div id="upload-info" class="mb-lg" style="font-size: 9px; line-height: 2; text-align: left;">
+                        <p class="text-primary">ℹ️ Upload Instructions:</p>
+                        <ul style="list-style: none; padding-left: 20px;">
+                            <li>✓ Maximum file size: 16 MB</li>
+                            <li>✓ Only PDF files accepted</li>
+                            <li>✓ Text-based PDFs work best</li>
+                            <li>✓ Scanned PDFs may not work</li>
+                        </ul>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="upload-btn">
+                        🚀 Upload & Process
+                    </button>
+                </form>
+
+                <div id="progress-container" class="hidden mt-lg">
+                    <div class="progress-bar-container">
+                        <div class="progress-label" id="progress-label">Processing...</div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" id="upload-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="upload-result" class="mt-lg"></div>
+            </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="card mt-xl" style="max-width: 600px; margin: var(--spacing-xl) auto 0;">
+            <div class="card-title">🤖 AI Question Generation</div>
+            <div class="card-content" style="font-size: 10px; line-height: 2;">
+                <p class="mb-md">After uploading, questions will be generated using Claude AI:</p>
+                <ul style="list-style: none; padding-left: 20px;">
+                    <li>• Multiple choice questions</li>
+                    <li>• True/False questions</li>
+                    <li>• Varying difficulty levels</li>
+                    <li>• Detailed explanations</li>
+                </ul>
+                <p class="text-accent mt-md">
+                    ⚠️ Note: Requires ANTHROPIC_API_KEY environment variable to be set.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-indicator" class="hidden notification info">Loading...</div>
+
+    <script>
+        const fileInput = document.getElementById('pdf-file');
+        const fileName = document.getElementById('file-name');
+        const uploadForm = document.getElementById('upload-form');
+        const uploadBtn = document.getElementById('upload-btn');
+        const progressContainer = document.getElementById('progress-container');
+        const uploadResult = document.getElementById('upload-result');
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                fileName.textContent = `Selected: ${e.target.files[0].name}`;
+            }
+        });
+
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '⏳ Uploading...';
+            progressContainer.classList.remove('hidden');
+            uploadResult.innerHTML = '';
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Upload failed');
+                }
+
+                // Success
+                uploadResult.innerHTML = `
+                    <div class="card" style="border-color: var(--color-hp-high);">
+                        <div class="card-title text-primary">✅ Upload Successful!</div>
+                        <div class="card-content" style="font-size: 10px;">
+                            <p><strong>Title:</strong> ${data.title}</p>
+                            <p><strong>Pages:</strong> ${data.num_pages}</p>
+                            <p><strong>Estimated Questions:</strong> ${data.estimated_questions}</p>
+                            <div class="btn-group mt-md">
+                                <button onclick="generateQuestions(${data.pdf_id})" class="btn btn-primary">
+                                    🤖 Generate Questions Now
+                                </button>
+                                <a href="/" class="btn btn-secondary">← Back to Home</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                uploadResult.innerHTML = `
+                    <div class="card" style="border-color: var(--color-danger);">
+                        <div class="card-title text-danger">❌ Upload Failed</div>
+                        <div class="card-content">
+                            <p>${error.message}</p>
+                        </div>
+                    </div>
+                `;
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '🚀 Upload & Process';
+            } finally {
+                progressContainer.classList.add('hidden');
+            }
+        });
+
+        async function generateQuestions(pdfId) {
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '⏳ Generating Questions...';
+            progressContainer.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`/api/generate-questions/${pdfId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ num_questions: 30 })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Generation failed');
+                }
+
+                alert(`✅ Generated ${data.questions_saved} questions!\nCost: ~$${data.cost_estimate.estimated_cost_usd.toFixed(4)}`);
+                window.location.href = '/';
+
+            } catch (error) {
+                console.error('Generation error:', error);
+                alert(`❌ Error: ${error.message}`);
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '🚀 Upload & Process';
+            } finally {
+                progressContainer.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

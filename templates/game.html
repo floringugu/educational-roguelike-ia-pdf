@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educational Roguelike - {{ pdf.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pixel-style.css') }}">
+</head>
+<body>
+    <div class="container" id="game-container" data-pdf-id="{{ pdf.id }}">
+        <!-- Header -->
+        <div class="page-header">
+            <h1 class="page-title">⚔️ {{ pdf.title }}</h1>
+            <div class="btn-group">
+                <a href="/" class="btn">🏠 Home</a>
+                <a href="/stats/{{ pdf.id }}" class="btn btn-secondary">📊 Stats</a>
+            </div>
+        </div>
+
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="{% if ready %}{% else %}visible{% endif %}">
+            {% if not ready %}
+            <div class="card text-center">
+                <div class="card-title text-warning">⚠️ Not Ready</div>
+                <div class="card-content">
+                    <p>{{ message }}</p>
+                    <a href="/" class="btn btn-primary mt-lg">← Back to Home</a>
+                </div>
+            </div>
+            {% else %}
+            <div class="card text-center">
+                <div class="card-title text-primary">🎮 Ready to Play!</div>
+                <div class="card-content">
+                    <p class="mb-lg" style="line-height: 2;">
+                        <strong>{{ question_count }}</strong> questions ready<br>
+                        Answer correctly to damage enemies<br>
+                        Wrong answers = enemy attacks you<br>
+                        Survive 10 encounters to win!
+                    </p>
+                    <button id="new-game-btn" class="btn btn-primary">⚔️ Start New Game</button>
+                    <a href="/saves/{{ pdf.id }}" class="btn mt-md">💾 Load Saved Game</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden">
+            <!-- Game Board -->
+            <div class="game-board">
+                <!-- Left Column: Player & Enemy -->
+                <div>
+                    <!-- Player Panel -->
+                    <div class="character-panel mb-lg">
+                        <div class="character-sprite player-sprite" id="player-sprite">🧙</div>
+                        <div class="character-info">
+                            <div class="character-name">You</div>
+
+                            <div class="health-bar-container">
+                                <div class="health-bar">
+                                    <div class="health-bar-fill" id="player-hp-fill" style="width: 100%"></div>
+                                    <div class="health-text" id="player-hp-text">100/100</div>
+                                </div>
+                            </div>
+
+                            <div class="character-stat">
+                                <span>💰 Score:</span>
+                                <span class="text-primary" id="player-score">0</span>
+                            </div>
+
+                            <div id="player-shield" class="shield-indicator hidden">
+                                🛡️ Shield: 0
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enemy Panel -->
+                    <div class="character-panel">
+                        <div class="character-sprite enemy-sprite" id="enemy-sprite">🐉</div>
+                        <div class="character-info">
+                            <div class="character-name" id="enemy-name">Dragon</div>
+                            <div id="boss-indicator" class="boss-indicator hidden">⚠️ BOSS ⚠️</div>
+
+                            <div class="health-bar-container">
+                                <div class="health-bar">
+                                    <div class="health-bar-fill" id="enemy-hp-fill" style="width: 100%"></div>
+                                    <div class="health-text" id="enemy-hp-text">100/100</div>
+                                </div>
+                            </div>
+
+                            <div class="character-stat">
+                                <span>💥 Damage:</span>
+                                <span class="text-danger" id="enemy-damage">25</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress-bar-container mt-lg">
+                        <div class="progress-label" id="progress-text">Encounter 1/10</div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" id="progress-fill" style="width: 10%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Session Stats -->
+                    <div class="card mt-lg">
+                        <div class="card-title">📈 Session Stats</div>
+                        <div class="card-content">
+                            <div class="character-stat">
+                                <span>Questions:</span>
+                                <span id="questions-answered">0</span>
+                            </div>
+                            <div class="character-stat">
+                                <span>Accuracy:</span>
+                                <span class="text-primary" id="session-accuracy">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Panel -->
+                    <div class="card mt-lg">
+                        <div class="card-title">🎒 Inventory</div>
+                        <div class="card-content" id="inventory-container">
+                            <div class="text-muted" id="inventory-empty">No items yet</div>
+                            <div id="inventory-items" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Save Button -->
+                    <button id="save-game-btn" class="btn btn-secondary mt-md" style="width: 100%;">
+                        💾 Save Game
+                    </button>
+                </div>
+
+                <!-- Right Column: Questions -->
+                <div>
+                    <!-- Question Panel -->
+                    <div id="question-panel" class="question-panel hidden">
+                        <div class="question-header">
+                            <div class="question-topic" id="question-topic">Topic</div>
+                            <div class="question-difficulty difficulty-medium" id="question-difficulty">medium</div>
+                        </div>
+
+                        <div class="question-text" id="question-text">
+                            Question will appear here...
+                        </div>
+
+                        <div class="answer-options" id="answer-options">
+                            <!-- Options will be inserted by JavaScript -->
+                        </div>
+
+                        <div class="btn-group mt-lg">
+                            <button id="submit-answer-btn" class="btn btn-primary">
+                                ⚔️ Submit Answer
+                            </button>
+                            <button id="next-question-btn" class="btn btn-secondary hidden">
+                                ➡️ Next Question
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Panel -->
+                    <div id="feedback-panel" class="feedback-panel hidden">
+                        <div class="feedback-title" id="feedback-title">Result</div>
+                        <div class="feedback-text" id="feedback-text">
+                            Explanation will appear here...
+                        </div>
+                    </div>
+
+                    <!-- Battle Log -->
+                    <div class="battle-log mt-lg" id="battle-log">
+                        <div class="log-entry log-info">> Welcome to the dungeon!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-indicator" class="hidden notification info">Loading...</div>
+
+    <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+</body>
+</html>

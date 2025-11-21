@@ -1,0 +1,69 @@
+# ═══════════════════════════════════════════════════════════════════
+# 📦 EDUCATIONAL ROGUELIKE - DEPENDENCIES WITH OCR SUPPORT
+# Python package requirements
+# ═══════════════════════════════════════════════════════════════════
+
+# Web Framework
+Flask==3.0.0
+Werkzeug==3.0.1
+
+# PDF Processing
+pdfplumber==0.10.3
+PyPDF2==3.0.1
+
+# AI / Grok API (xAI) - Uses OpenAI SDK
+openai>=1.0.0
+
+# Database (SQLite is built-in to Python)
+
+# Utilities
+python-dotenv==1.0.0
+
+# Optional: For better error handling
+Jinja2==3.1.2
+MarkupSafe==2.1.3
+click==8.1.7
+itsdangerous==2.1.2
+
+# ═══════════════════════════════════════════════════════════════════
+# 🔍 OCR DEPENDENCIES (Install based on your preferred engine)
+# ═══════════════════════════════════════════════════════════════════
+
+# Option 1: Tesseract OCR (Recommended - Fast and reliable)
+# Requires tesseract-ocr system package:
+#   - Ubuntu/Debian: sudo apt-get install tesseract-ocr tesseract-ocr-spa
+#   - macOS: brew install tesseract tesseract-lang
+#   - Windows: Download from https://github.com/UB-Mannheim/tesseract/wiki
+pytesseract>=0.3.10
+Pillow>=10.0.0
+opencv-python>=4.8.0
+
+# Option 2: EasyOCR (Deep learning based - More accurate but slower)
+# Uncomment if you prefer EasyOCR:
+# easyocr>=1.7.0
+# torch>=2.0.0
+# torchvision>=0.15.0
+
+# Option 3: PaddleOCR (Fast and accurate - Good balance)
+# Uncomment if you prefer PaddleOCR:
+# paddleocr>=2.7.0
+# paddlepaddle>=2.5.0
+
+# Image Processing (Required for all OCR engines)
+numpy>=1.24.0
+opencv-python-headless>=4.8.0  # Headless version for servers
+
+# PDF to Image conversion (Optional but recommended for better OCR)
+pdf2image>=1.16.3
+# Requires poppler system package:
+#   - Ubuntu/Debian: sudo apt-get install poppler-utils
+#   - macOS: brew install poppler
+#   - Windows: Download from https://github.com/oschwartz10612/poppler-windows
+
+# ═══════════════════════════════════════════════════════════════════
+# 🧪 DEVELOPMENT DEPENDENCIES (optional)
+# ═══════════════════════════════════════════════════════════════════
+# pytest==7.4.3
+# pytest-flask==1.3.0
+# black==23.12.1
+# flake8==7.0.0

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics - {{ pdf.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pixel-style.css') }}">
+</head>
+<body>
+    <div class="container" id="stats-container" data-pdf-id="{{ pdf.id }}">
+        <!-- Header -->
+        <div class="page-header">
+            <h1 class="page-title">📊 STATISTICS</h1>
+            <p class="page-subtitle">{{ pdf.title }}</p>
+        </div>
+
+        <div class="btn-group mb-xl">
+            <a href="/" class="btn">🏠 Home</a>
+            <a href="/game/{{ pdf.id }}" class="btn btn-primary">⚔️ Play</a>
+            <button id="refresh-stats" class="btn btn-secondary">🔄 Refresh</button>
+        </div>
+
+        <!-- Overall Stats -->
+        <h2 class="text-center text-primary mb-lg">🎯 Overall Performance</h2>
+
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-value" id="total-answers">0</span>
+                <span class="stat-label">Questions Answered</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value" id="correct-answers">0</span>
+                <span class="stat-label">Correct Answers</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value text-primary" id="overall-accuracy">0%</span>
+                <span class="stat-label">Accuracy</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value" id="total-time">0m</span>
+                <span class="stat-label">Study Time</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value text-accent" id="total-score">0</span>
+                <span class="stat-label">Total Score</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value" id="completed-games">0</span>
+                <span class="stat-label">Games Completed</span>
+            </div>
+        </div>
+
+        <!-- Learning Insights -->
+        {% if insights %}
+        <div class="card mt-xl">
+            <div class="card-title">💡 Learning Insights</div>
+            <div class="card-content">
+                <p class="mb-md">
+                    <strong>Level:</strong>
+                    <span class="text-primary">{{ insights.overall_level }}</span>
+                </p>
+
+                {% if insights.strong_topics %}
+                <p class="mb-sm"><strong class="text-primary">🌟 Strong Areas:</strong></p>
+                <ul style="list-style: none; padding-left: 20px; margin-bottom: var(--spacing-md);">
+                    {% for topic in insights.strong_topics %}
+                    <li class="text-accent">✓ {{ topic }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                {% if insights.weak_topics %}
+                <p class="mb-sm"><strong class="text-warning">📚 Needs Practice:</strong></p>
+                <ul style="list-style: none; padding-left: 20px; margin-bottom: var(--spacing-md);">
+                    {% for topic in insights.weak_topics %}
+                    <li class="text-warning">• {{ topic }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                {% if insights.recommendations %}
+                <p class="mb-sm"><strong>💡 Recommendations:</strong></p>
+                <ul style="list-style: none; padding-left: 20px;">
+                    {% for rec in insights.recommendations %}
+                    <li>→ {{ rec }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Topic Performance -->
+        <h2 class="text-center text-primary mb-lg mt-xl">📚 Performance by Topic</h2>
+        <div id="topic-performance" class="card-grid">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Weak Areas -->
+        <h2 class="text-center text-warning mb-lg mt-xl">⚠️ Areas Needing Improvement</h2>
+        <div id="weak-areas">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Export Options -->
+        <div class="card mt-xl">
+            <div class="card-title">📥 Export Statistics</div>
+            <div class="card-content">
+                <p class="mb-md" style="font-size: 10px;">
+                    Download your learning statistics in different formats:
+                </p>
+                <div class="btn-group">
+                    <button id="export-json" class="btn">JSON</button>
+                    <button id="export-csv" class="btn">CSV</button>
+                    <button id="export-markdown" class="btn btn-primary">Markdown Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-indicator" class="hidden notification info">Loading...</div>
+
+    <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/stats.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,826 @@
+/*
+═══════════════════════════════════════════════════════════════════
+🎨 EDUCATIONAL ROGUELIKE - PIXEL ART STYLESHEET
+Retro pixel art aesthetic with animations
+═══════════════════════════════════════════════════════════════════
+*/
+
+/* ═══════════════════════════════════════════════════════════════
+   📦 IMPORTS & FONTS
+   ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════
+   🎯 CSS VARIABLES - RETRO COLOR PALETTE
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+    /* Colors */
+    --color-primary: #00ff00;
+    --color-secondary: #ff00ff;
+    --color-accent: #00ffff;
+    --color-warning: #ffff00;
+    --color-danger: #ff0000;
+    --color-background: #1a1a2e;
+    --color-surface: #16213e;
+    --color-text: #ffffff;
+    --color-border: #00ff00;
+    --color-shadow: rgba(0, 255, 0, 0.3);
+
+    /* Health colors */
+    --color-hp-high: #00ff00;
+    --color-hp-medium: #ffff00;
+    --color-hp-low: #ff8800;
+    --color-hp-critical: #ff0000;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+
+    /* Borders */
+    --border-width: 4px;
+    --border-radius: 0px;
+
+    /* Animations */
+    --animation-fast: 200ms;
+    --animation-medium: 400ms;
+    --animation-slow: 600ms;
+
+    /* Pixel rendering */
+    --pixel-size: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   🌐 GLOBAL STYLES
+   ═══════════════════════════════════════════════════════════════ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Press Start 2P', cursive;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    line-height: 1.6;
+    font-size: 12px;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    overflow-x: hidden;
+}
+
+/* Animated background */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        linear-gradient(90deg, transparent 98%, var(--color-primary) 98%),
+        linear-gradient(0deg, transparent 98%, var(--color-primary) 98%);
+    background-size: 20px 20px;
+    opacity: 0.03;
+    z-index: -1;
+    animation: gridScroll 20s linear infinite;
+}
+
+@keyframes gridScroll {
+    0% { background-position: 0 0; }
+    100% { background-position: 20px 20px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   📦 CONTAINERS & LAYOUT
+   ═══════════════════════════════════════════════════════════════ */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-surface);
+    box-shadow: 0 0 20px var(--color-shadow);
+    animation: fadeInDown 0.6s ease-out;
+}
+
+.page-title {
+    font-size: 24px;
+    color: var(--color-primary);
+    text-shadow:
+        2px 2px 0 var(--color-danger),
+        4px 4px 0 var(--color-accent);
+    animation: titleGlitch 3s ease-in-out infinite;
+    margin-bottom: var(--spacing-md);
+}
+
+.page-subtitle {
+    font-size: 10px;
+    color: var(--color-accent);
+    opacity: 0.8;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   🎮 GAME UI COMPONENTS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Game Board */
+.game-board {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Character Display (Player & Enemy) */
+.character-panel {
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-surface);
+    padding: var(--spacing-lg);
+    position: relative;
+    box-shadow: 0 0 20px var(--color-shadow);
+}
+
+.character-sprite {
+    font-size: 64px;
+    text-align: center;
+    margin: var(--spacing-lg) 0;
+    filter: drop-shadow(0 0 10px currentColor);
+}
+
+.player-sprite {
+    animation: playerIdle 2s ease-in-out infinite;
+}
+
+.enemy-sprite {
+    animation: enemyIdle 2s ease-in-out infinite;
+}
+
+/* Character attacking */
+.character-sprite.attacking {
+    animation: attackShake 0.6s ease-out;
+}
+
+.character-sprite.damaged {
+    animation: damageFlash 0.4s ease-out;
+}
+
+/* Character Info */
+.character-info {
+    text-align: center;
+}
+
+.character-name {
+    font-size: 14px;
+    color: var(--color-accent);
+    margin-bottom: var(--spacing-sm);
+}
+
+.character-stat {
+    display: flex;
+    justify-content: space-between;
+    margin: var(--spacing-sm) 0;
+    font-size: 10px;
+}
+
+/* Health Bar */
+.health-bar-container {
+    margin: var(--spacing-md) 0;
+    position: relative;
+}
+
+.health-bar {
+    width: 100%;
+    height: 24px;
+    border: var(--border-width) solid var(--color-border);
+    background-color: #000;
+    position: relative;
+    overflow: hidden;
+}
+
+.health-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-hp-high) 0%, var(--color-hp-medium) 100%);
+    transition: width 0.4s ease-out, background-color 0.4s ease-out;
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.health-bar-fill.low {
+    background: linear-gradient(90deg, var(--color-hp-low) 0%, var(--color-hp-critical) 100%);
+    animation: healthPulse 1s ease-in-out infinite;
+}
+
+.health-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+    color: var(--color-text);
+    text-shadow: 1px 1px 2px #000;
+    z-index: 1;
+}
+
+/* Shield indicator */
+.shield-indicator {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--color-accent);
+    color: var(--color-background);
+    border: 2px solid var(--color-border);
+    margin-top: var(--spacing-sm);
+    animation: shieldPulse 1s ease-in-out infinite;
+}
+
+/* Progress Bar */
+.progress-bar-container {
+    margin: var(--spacing-md) 0;
+}
+
+.progress-label {
+    font-size: 10px;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    border: var(--border-width) solid var(--color-border);
+    background-color: #000;
+    position: relative;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: repeating-linear-gradient(
+        90deg,
+        var(--color-primary),
+        var(--color-primary) 10px,
+        var(--color-accent) 10px,
+        var(--color-accent) 20px
+    );
+    transition: width 0.4s ease-out;
+    animation: progressSlide 1s linear infinite;
+}
+
+/* Question Panel */
+.question-panel {
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-surface);
+    padding: var(--spacing-lg);
+    box-shadow: 0 0 20px var(--color-shadow);
+    animation: fadeIn 0.4s ease-out;
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.question-topic {
+    color: var(--color-accent);
+    font-size: 10px;
+}
+
+.question-difficulty {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 2px solid var(--color-border);
+    font-size: 8px;
+}
+
+.difficulty-easy { background-color: var(--color-hp-high); color: #000; }
+.difficulty-medium { background-color: var(--color-warning); color: #000; }
+.difficulty-hard { background-color: var(--color-danger); }
+
+.question-text {
+    font-size: 12px;
+    line-height: 1.8;
+    margin: var(--spacing-lg) 0;
+    color: var(--color-text);
+}
+
+/* Answer Options */
+.answer-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.answer-option {
+    padding: var(--spacing-md);
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-background);
+    cursor: pointer;
+    transition: all var(--animation-fast);
+    position: relative;
+    font-size: 11px;
+}
+
+.answer-option:hover {
+    background-color: var(--color-surface);
+    transform: translateX(8px);
+    box-shadow: -8px 0 0 var(--color-primary);
+}
+
+.answer-option:active {
+    transform: translateX(4px);
+}
+
+.answer-option.selected {
+    background-color: var(--color-accent);
+    color: var(--color-background);
+    border-color: var(--color-accent);
+}
+
+.answer-option.correct {
+    background-color: var(--color-hp-high);
+    color: var(--color-background);
+    border-color: var(--color-hp-high);
+    animation: correctAnswer 0.6s ease-out;
+}
+
+.answer-option.incorrect {
+    background-color: var(--color-danger);
+    border-color: var(--color-danger);
+    animation: incorrectAnswer 0.6s ease-out;
+}
+
+/* Feedback Panel */
+.feedback-panel {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-surface);
+    animation: slideInUp 0.4s ease-out;
+}
+
+.feedback-panel.correct {
+    border-color: var(--color-hp-high);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+}
+
+.feedback-panel.incorrect {
+    border-color: var(--color-danger);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+}
+
+.feedback-title {
+    font-size: 14px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.feedback-panel.correct .feedback-title {
+    color: var(--color-hp-high);
+}
+
+.feedback-panel.incorrect .feedback-title {
+    color: var(--color-danger);
+}
+
+.feedback-text {
+    font-size: 10px;
+    line-height: 1.8;
+    opacity: 0.9;
+}
+
+/* Battle Log */
+.battle-log {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+    border: var(--border-width) solid var(--color-border);
+    background-color: #000;
+    max-height: 150px;
+    overflow-y: auto;
+    font-size: 9px;
+}
+
+.log-entry {
+    padding: var(--spacing-xs) 0;
+    border-bottom: 1px solid var(--color-border);
+    opacity: 0.8;
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+    opacity: 1;
+}
+
+.log-damage { color: var(--color-danger); }
+.log-heal { color: var(--color-hp-high); }
+.log-info { color: var(--color-accent); }
+
+/* ═══════════════════════════════════════════════════════════════
+   🎯 BUTTONS
+   ═══════════════════════════════════════════════════════════════ */
+
+.btn {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all var(--animation-fast);
+    position: relative;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn:hover {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 0 var(--color-border);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-background);
+}
+
+.btn-danger {
+    background-color: var(--color-danger);
+    border-color: var(--color-danger);
+}
+
+.btn-secondary {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-background);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn:disabled:hover {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-group {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   📋 CARDS & PANELS
+   ═══════════════════════════════════════════════════════════════ */
+
+.card {
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-surface);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: 0 0 20px var(--color-shadow);
+    transition: transform var(--animation-fast);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px var(--color-shadow);
+}
+
+.card-title {
+    font-size: 14px;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.card-content {
+    font-size: 10px;
+    line-height: 1.8;
+}
+
+/* Grid of cards */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   📊 STATISTICS
+   ═══════════════════════════════════════════════════════════════ */
+
+.stat-box {
+    text-align: center;
+    padding: var(--spacing-lg);
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-surface);
+}
+
+.stat-value {
+    font-size: 24px;
+    color: var(--color-primary);
+    display: block;
+    margin-bottom: var(--spacing-sm);
+}
+
+.stat-label {
+    font-size: 9px;
+    color: var(--color-accent);
+    opacity: 0.8;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   🎬 ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes playerIdle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+@keyframes enemyIdle {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes attackShake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+    20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+@keyframes damageFlash {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(2) hue-rotate(180deg); }
+}
+
+@keyframes correctAnswer {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes incorrectAnswer {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+@keyframes healthPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes shieldPulse {
+    0%, 100% { box-shadow: 0 0 0 var(--color-accent); }
+    50% { box-shadow: 0 0 20px var(--color-accent); }
+}
+
+@keyframes progressSlide {
+    0% { background-position: 0 0; }
+    100% { background-position: 20px 0; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes titleGlitch {
+    0%, 90%, 100% { text-shadow: 2px 2px 0 var(--color-danger), 4px 4px 0 var(--color-accent); }
+    93% { text-shadow: -2px -2px 0 var(--color-accent), -4px -4px 0 var(--color-danger); }
+    96% { text-shadow: 2px -2px 0 var(--color-accent), -4px 4px 0 var(--color-danger); }
+}
+
+/* Victory/Defeat animations */
+@keyframes victory {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.2) rotate(-5deg); }
+    50% { transform: scale(1.3) rotate(5deg); }
+    75% { transform: scale(1.2) rotate(-5deg); }
+}
+
+@keyframes defeat {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(100px) rotate(90deg); opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   📱 RESPONSIVE DESIGN
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+    .game-board {
+        grid-template-columns: 1fr;
+    }
+
+    .page-title {
+        font-size: 18px;
+    }
+
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .character-sprite {
+        font-size: 48px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   🔧 UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════ */
+
+.text-center { text-align: center; }
+.text-primary { color: var(--color-primary); }
+.text-danger { color: var(--color-danger); }
+.text-accent { color: var(--color-accent); }
+.text-warning { color: var(--color-warning); }
+
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+.mb-xl { margin-bottom: var(--spacing-xl); }
+
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mt-xl { margin-top: var(--spacing-xl); }
+
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+
+.hidden { display: none; }
+.visible { display: block; }
+
+/* Loading spinner */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--color-border);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Notification/toast */
+.notification {
+    position: fixed;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    padding: var(--spacing-md);
+    border: var(--border-width) solid var(--color-border);
+    background-color: var(--color-surface);
+    z-index: 1000;
+    animation: slideInRight 0.4s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification.success { border-color: var(--color-hp-high); }
+.notification.error { border-color: var(--color-danger); }
+.notification.info { border-color: var(--color-accent); }
+
+/* ═══════════════════════════════════════════════════════════════════ */
+/* Inventory Styles */
+/* ═══════════════════════════════════════════════════════════════════ */
+
+.inventory-item {
+    background-color: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 14px;
+}
+
+.inventory-item:hover {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+}
+
+.inventory-item:active {
+    transform: translateY(0);
+}
+
+.powerup-name {
+    font-weight: bold;
+}
+
+.powerup-count {
+    background-color: var(--color-accent);
+    color: var(--color-background);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-left: var(--spacing-sm);
+}
+
+/* ═══════════════════════════════════════════════════════════════════ */
+/* Boss Indicator */
+/* ═══════════════════════════════════════════════════════════════════ */
+
+.boss-indicator {
+    background-color: var(--color-danger);
+    color: var(--color-text);
+    padding: 4px 12px;
+    margin: 4px 0;
+    border: var(--border-width) solid var(--color-text);
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    animation: boss-pulse 1s ease-in-out infinite;
+}
+
+@keyframes boss-pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
